@@ -208,19 +208,14 @@ def GPT_request(prompt, gpt_parameter):
   """
   temp_sleep()
   try: 
-    response = openai.Completion.create(
+    response = openai.ChatCompletion.create(
                 model=gpt_parameter["engine"],
-                prompt=prompt,
-                temperature=gpt_parameter["temperature"],
-                max_tokens=gpt_parameter["max_tokens"],
-                top_p=gpt_parameter["top_p"],
-                frequency_penalty=gpt_parameter["frequency_penalty"],
-                presence_penalty=gpt_parameter["presence_penalty"],
-                stream=gpt_parameter["stream"],
-                stop=gpt_parameter["stop"],)
-    return response.choices[0].text
-  except: 
-    print ("TOKEN LIMIT EXCEEDED")
+                messages=[{"role": "user", "content": prompt}],
+    )
+    print("======:", response)
+    return response["choices"][0]["message"]["content"]
+  except Exception as e:
+    print ("TOKEN LIMIT EXCEEDED", e)
     return "TOKEN LIMIT EXCEEDED"
 
 
@@ -277,12 +272,13 @@ def get_embedding(text, model="text-embedding-ada-002"):
   text = text.replace("\n", " ")
   if not text: 
     text = "this is blank"
+  print("cccc:", text)
   return openai.Embedding.create(
           input=[text], model=model)['data'][0]['embedding']
 
 
 if __name__ == '__main__':
-  gpt_parameter = {"engine": "text-davinci-003", "max_tokens": 50, 
+  gpt_parameter = {"engine": "gpt-3.5-turbo", "max_tokens": 1000,
                    "temperature": 0, "top_p": 1, "stream": False,
                    "frequency_penalty": 0, "presence_penalty": 0, 
                    "stop": ['"']}
@@ -309,7 +305,6 @@ if __name__ == '__main__':
                                  True)
 
   print (output)
-
 
 
 
